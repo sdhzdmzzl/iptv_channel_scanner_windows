@@ -28,7 +28,6 @@ string getnicname(string description)
 	PIP_ADAPTER_INFO pAdapter = NULL;
 	unsigned long stSize = sizeof(IP_ADAPTER_INFO);
 	int nRel = GetAdaptersInfo(pIpAdapterInfo, &stSize);
-	int netCardNum = 0;
 	int IPnumPerNetCard = 0;
 	if (ERROR_BUFFER_OVERFLOW == nRel)
 	{
