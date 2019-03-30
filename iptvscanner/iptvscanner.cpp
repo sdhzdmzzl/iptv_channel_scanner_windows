@@ -20,7 +20,7 @@
 #pragma comment(lib, "Packet.lib")
 using namespace std;
 char nicname[1024] = { 0 };
-
+unsigned int seconds = 150;
 string getnicname(string description)
 {
 	string nicname = "";
@@ -120,7 +120,7 @@ int iptvscan(unsigned int ip)
 	pcap_compile(device, &filter, strfilter, 1, 0);
 	pcap_setfilter(device, &filter);
 
-	Sleep(1500);
+	Sleep(seconds);
 	struct pcap_pkthdr packet;
 	const u_char *pktStr = pcap_next(device, &packet);
 	if (pktStr)
@@ -150,12 +150,20 @@ int main(int argc, char *argv[])
 	int i = 0;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	int inum;
-	if (argc != 3)
+	if (argc != 3 && argc != 4)
 	{
 		cout << "usage:" << endl
 			<< "\t" << argv[0] << " \"start of ip\" \"end of ip\" " << endl;
 		cout << "\t eg.. " << argv[0] << " 239.3.1.1 239.3.1.254" << endl;
 		return -1;
+	}
+	if (argc == 4)
+	{
+		int secs = atoi(argv[3]);
+		if (secs > seconds)
+		{
+			seconds = secs;
+		}
 	}
 	WORD wVersionRequested;
 	WSADATA wsaData;
