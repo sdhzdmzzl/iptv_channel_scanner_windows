@@ -20,7 +20,7 @@
 #pragma comment(lib, "Packet.lib")
 using namespace std;
 char nicname[1024] = { 0 };
-unsigned int seconds = 150;
+unsigned int seconds = 1500;
 string getnicname(string description)
 {
 	string nicname = "";
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 	if (argc == 4)
 	{
 		int secs = atoi(argv[3]);
-		if (secs > seconds)
+		if (secs >= 150)
 		{
 			seconds = secs;
 		}
