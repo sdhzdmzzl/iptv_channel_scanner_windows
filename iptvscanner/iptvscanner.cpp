@@ -13,6 +13,7 @@
 #include <pcap.h>
 #include <Iphlpapi.h>
 #include <iostream>
+#include <set>
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib,"Iphlpapi.lib")
@@ -121,15 +122,23 @@ int iptvscan(unsigned int ip)
 	pcap_setfilter(device, &filter);
 
 	Sleep(seconds);
+	int count = 0;
 	struct pcap_pkthdr packet;
+	std::set<int> ports;
 	const u_char *pktStr = pcap_next(device, &packet);
-	if (pktStr)
+	while (pktStr && (count++<1000))
 	{
 		struct udphdr *udphdr = NULL;
 		udphdr = (struct udphdr *)(pktStr + 14 + 20);
-		printf("#EXTINF:-1,%s:%d\nrtp://%s:%d\n", strip, ntohs(udphdr->dport), strip, ntohs(udphdr->dport));
+		ports.insert(udphdr->dport);
+		//printf("#EXTINF:-1,%s:%d\nrtp://%s:%d\n", strip, ntohs(udphdr->dport), strip, ntohs(udphdr->dport));
+		pktStr = pcap_next(device, &packet);
 
 	}
+	std::set<int>::iterator it;
+	for (it = ports.begin(); it != ports.end(); ++it)
+		printf("#EXTINF:-1,%s:%d\nrtp://%s:%d\n", strip, ntohs(*it), strip, ntohs(*it));
+
 	pcap_close(device);
 
 	err = setsockopt(s, IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&mreq, sizeof(mreq));
