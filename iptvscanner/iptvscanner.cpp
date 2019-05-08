@@ -3,13 +3,14 @@
 
 #include "stdafx.h"
 
-
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <winsock2.h>
 #include <string.h>
+#include <fstream>
 #include <pcap.h>
 #include <Iphlpapi.h>
 #include <iostream>
@@ -22,6 +23,7 @@
 using namespace std;
 char nicname[1024] = { 0 };
 unsigned int seconds = 1500;
+set<string> addrs;
 string getnicname(string description)
 {
 	string nicname = "";
@@ -137,7 +139,12 @@ int iptvscan(unsigned int ip)
 	}
 	std::set<int>::iterator it;
 	for (it = ports.begin(); it != ports.end(); ++it)
-		printf("#EXTINF:-1,%s:%d\nrtp://%s:%d\n", strip, ntohs(*it), strip, ntohs(*it));
+	{
+		char addr[1024] = { 0 };
+		sprintf_s(addr, "#EXTINF:-1,%s:%d\nrtp://%s:%d\n", strip, ntohs(*it), strip, ntohs(*it));
+		printf(addr);
+		addrs.insert(addr);
+	}
 
 	pcap_close(device);
 
@@ -249,5 +256,26 @@ int main(int argc, char *argv[])
 	{
 		iptvscan(ip);
 	}
+	struct tm today;
+	time_t ltime;
+	char filename[512] = { 0 };
+	time(&ltime);
+	errno_t err1 = _localtime64_s(&today, &ltime);
+
+	strftime(filename, 512, "IPTV-%Y-%m-%d_%H-%M-%S.m3u", &today);
+	cout <<"iptvlist will be output to " << filename << endl;
+	ofstream file;
+	file.open(filename);
+	file << "#EXTM3U name=\"bj-unicom-iptv\"" << endl;
+	std::set<string>::iterator it;
+	for (it = addrs.begin(); it != addrs.end(); ++it)
+	{
+		string a = *it;
+		const char* p = a.c_str();
+		file << p;
+		//file << a;
+	}
+	file.close();
+
 }
 
