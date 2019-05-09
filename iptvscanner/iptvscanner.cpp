@@ -15,6 +15,7 @@
 #include <Iphlpapi.h>
 #include <iostream>
 #include <set>
+#include <vector>
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib,"Iphlpapi.lib")
@@ -23,7 +24,7 @@
 using namespace std;
 char nicname[1024] = { 0 };
 unsigned int seconds = 1500;
-set<string> addrs;
+vector<string> addrs;
 string getnicname(string description)
 {
 	string nicname = "";
@@ -143,7 +144,7 @@ int iptvscan(unsigned int ip)
 		char addr[1024] = { 0 };
 		sprintf_s(addr, "#EXTINF:-1,%s:%d\nrtp://%s:%d\n", strip, ntohs(*it), strip, ntohs(*it));
 		printf(addr);
-		addrs.insert(addr);
+		addrs.push_back(addr);
 	}
 
 	pcap_close(device);
@@ -267,7 +268,7 @@ int main(int argc, char *argv[])
 	ofstream file;
 	file.open(filename);
 	file << "#EXTM3U name=\"bj-unicom-iptv\"" << endl;
-	std::set<string>::iterator it;
+	std::vector<string>::iterator it;
 	for (it = addrs.begin(); it != addrs.end(); ++it)
 	{
 		string a = *it;
